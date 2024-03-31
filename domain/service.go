@@ -1,20 +1,36 @@
 package domain
 
 import (
+	"context"
 	"log/slog"
+	"sync"
 
 	"deshev.com/eth-address-watch/config"
 )
 
-type Service struct{}
+type Service struct {
+	mtx                sync.RWMutex
+	log                *slog.Logger
+	cfg                *config.Config
+	blockInput         <-chan *Block
+	currentBlockNumber int
+}
 
-func NewService(log *slog.Logger, c *config.Config) *Service {
-	return &Service{}
+func NewService(log *slog.Logger, c *config.Config, blockInput <-chan *Block) *Service {
+	return &Service{
+		log:                log,
+		cfg:                c,
+		blockInput:         blockInput,
+		currentBlockNumber: 0,
+	}
 }
 
 // last parsed block
 func (s *Service) GetCurrentBlock() int {
-	return 0
+	s.mtx.RLock()
+	defer s.mtx.RUnlock()
+
+	return s.currentBlockNumber
 }
 
 // add address to observer
@@ -22,17 +38,26 @@ func (s *Service) Subscribe(address string) bool {
 	return true
 }
 
-type Transaction struct {
-	BlockNumber int    `json:"blockNumber"`
-	From        string `json:"from,omitempty"`
-	To          string `json:"to,omitempty"`
-	Value       string `json:"value,omitempty"`
-	Gas         string `json:"gas,omitempty"`
-	GasPrice    string `json:"gasPrice,omitempty"`
-	Input       string `json:"input,omitempty"`
-}
-
 // list of inbound or outbound transactions for an address
 func (s *Service) GetTransactions(address string) []Transaction {
 	return []Transaction{}
+}
+
+func (s *Service) Start(ctx context.Context) error {
+	for {
+		select {
+		case <-ctx.Done():
+			return nil
+		case block := <-s.blockInput:
+			s.processBlock(block)
+		}
+	}
+}
+
+func (s *Service) processBlock(block *Block) {
+	s.mtx.Lock()
+	defer s.mtx.Unlock()
+
+	s.log.Info("service processing block", "block", block.NumberParsed, "transactions", len(block.Transactions))
+	s.currentBlockNumber = block.NumberParsed
 }

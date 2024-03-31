@@ -547,7 +547,10 @@ linters:
 
 issues:
   exclude-rules:
-    # disable funlen for test funcs
+    # disable funlen for table test funcs
     - source: "^func Test"
       linters:
         - funlen
+    - path: (.+)_test.go
+      linters:
+        - wrapcheck

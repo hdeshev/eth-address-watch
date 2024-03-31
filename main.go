@@ -17,9 +17,10 @@ func main() {
 	app := internal.NewApplication(ctx, log)
 	log.Info("starting eth-address-watch")
 
-	ops.Go(app.StartWatcher)
-	ops.Go(app.StartServer)
-	ops.Go(app.StartMonitor)
+	ops.Go(app.StartBlockWatcher)
+	ops.Go(app.StartAPIServer)
+	ops.Go(app.StartNotificationService)
+	ops.Go(app.StartSignalMonitor)
 
 	err := ops.Wait()
 	if !errors.Is(err, context.Canceled) {

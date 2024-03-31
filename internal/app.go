@@ -6,9 +6,14 @@ import (
 	"os"
 	"os/signal"
 
+	"deshev.com/eth-address-watch/client/eth"
 	"deshev.com/eth-address-watch/config"
 	"deshev.com/eth-address-watch/domain"
 	"deshev.com/eth-address-watch/http"
+)
+
+const (
+	blockBufferSize = 10
 )
 
 type Application struct {
@@ -19,13 +24,17 @@ type Application struct {
 	service *domain.Service
 	watcher *domain.Watcher
 	server  *http.Server
+	blockC  chan *domain.Block
 }
 
 func NewApplication(ctx context.Context, log *slog.Logger) *Application {
 	cfg := config.New()
-	service := domain.NewService(log, cfg)
+	blockC := make(chan *domain.Block, blockBufferSize)
+
+	service := domain.NewService(log, cfg, blockC)
 	server := http.NewServer(log, service)
-	watcher := domain.NewWatcher(log, cfg)
+	client := eth.NewClient(cfg)
+	watcher := domain.NewWatcher(log, cfg, client, blockC)
 
 	return &Application{
 		ctx:    ctx,
@@ -35,20 +44,26 @@ func NewApplication(ctx context.Context, log *slog.Logger) *Application {
 		service: service,
 		server:  server,
 		watcher: watcher,
+		blockC:  blockC,
 	}
 }
 
-func (a *Application) StartServer() error {
+func (a *Application) StartAPIServer() error {
 	//nolint:wrapcheck // boot errors are logged in main
 	return a.server.Start(a.ctx)
 }
 
-func (a *Application) StartWatcher() error {
+func (a *Application) StartBlockWatcher() error {
 	//nolint:wrapcheck // boot errors are logged in main
 	return a.watcher.Start(a.ctx)
 }
 
-func (a *Application) StartMonitor() error {
+func (a *Application) StartNotificationService() error {
+	//nolint:wrapcheck // boot errors are logged in main
+	return a.service.Start(a.ctx)
+}
+
+func (a *Application) StartSignalMonitor() error {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 	select {
