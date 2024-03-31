@@ -1,5 +1,7 @@
 FROM golang:1.22 as builder
 
+RUN update-ca-certificates
+
 ENV GO111MODULE=on \
     CGO_ENABLED=0 \
     GOOS=linux \
@@ -17,6 +19,8 @@ RUN go build -v -o "../eth-address-watch"
 
 # Second stage - `scratch` for production builds
 FROM scratch
+
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 WORKDIR "/opt"
 

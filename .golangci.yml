@@ -380,7 +380,7 @@ linters-settings:
     key-naming-case: snake
     # Enforce putting arguments on separate lines.
     # Default: false
-    args-on-sep-lines: true
+    args-on-sep-lines: false
 
   staticcheck:
     # Staticcheck is a go vet on steroids, applying a ton of static analysis checks
@@ -544,3 +544,10 @@ linters:
 
   # Might be useful for larger/coporate projects. Probably not for a hobby project
   # - depguard
+
+issues:
+  exclude-rules:
+    # disable funlen for test funcs
+    - source: "^func Test"
+      linters:
+        - funlen

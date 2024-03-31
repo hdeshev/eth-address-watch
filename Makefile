@@ -81,8 +81,6 @@ run:
 docker-gen:
 	echo "Building docker image \`$(IMAGE):$(VERSION)\`..."
 	docker build --rm \
-		--build-arg final_image=scratch \
-		--build-arg build_mode=production \
 		-t $(IMAGE):$(VERSION) . \
 		-f ./Dockerfile
 
@@ -91,3 +89,9 @@ docker-gen:
 clean-docker:
 	echo "Removing docker $(IMAGE):$(VERSION)..."
 	docker rmi -f $(IMAGE):$(VERSION)
+
+docker-run:
+	echo "Running docker image \`$(IMAGE):$(VERSION)\`..."
+	docker run --rm \
+		-p 9000:9000 \
+		-t $(IMAGE):$(VERSION)

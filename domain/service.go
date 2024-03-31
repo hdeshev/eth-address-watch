@@ -23,13 +23,13 @@ func (s *Service) Subscribe(address string) bool {
 }
 
 type Transaction struct {
-	BlockNumber int
-	From        string
-	To          string
-	Value       string
-	Gas         string
-	GasPrice    string
-	Input       string
+	BlockNumber int    `json:"blockNumber"`
+	From        string `json:"from,omitempty"`
+	To          string `json:"to,omitempty"`
+	Value       string `json:"value,omitempty"`
+	Gas         string `json:"gas,omitempty"`
+	GasPrice    string `json:"gasPrice,omitempty"`
+	Input       string `json:"input,omitempty"`
 }
 
 // list of inbound or outbound transactions for an address

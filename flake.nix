@@ -25,7 +25,7 @@
       in
       rec {
         name = "flake 1";
-        description = "Cashu 1";
+        description = "eth-watcher 1";
         devShells.default = shell;
       }
     );
