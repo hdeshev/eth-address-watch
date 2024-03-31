@@ -6,18 +6,15 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"deshev.com/eth-address-watch/config"
 )
 
 func Test_Service_Start(t *testing.T) {
 	log := slog.Default()
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	cfg := &config.Config{}
 
 	blockC := make(chan *Block)
-	s := NewService(log, cfg, blockC)
+	s := NewService(log, blockC)
 	end := make(chan struct{})
 	var err error
 	go func() {
@@ -32,9 +29,8 @@ func Test_Service_Start(t *testing.T) {
 
 func Test_GetCurrentBlock(t *testing.T) {
 	log := slog.Default()
-	cfg := &config.Config{}
 	blockC := make(chan *Block)
-	s := NewService(log, cfg, blockC)
+	s := NewService(log, blockC)
 
 	b := &Block{
 		Number:       "0x11",
@@ -43,4 +39,28 @@ func Test_GetCurrentBlock(t *testing.T) {
 	s.processBlock(b)
 
 	assert.Equal(t, 0x11, s.GetCurrentBlock())
+}
+
+func Test_Subscribe(t *testing.T) {
+	log := slog.Default()
+	blockC := make(chan *Block)
+	s := NewService(log, blockC)
+
+	s.Subscribe("0x1111")
+
+	b := &Block{
+		Number:       "0x11",
+		NumberParsed: 0x11,
+		Transactions: []*Transaction{
+			{From: "0x1111", To: "0x1112"},
+			{From: "0x1112", To: "0x1111"},
+			{From: "0x2111", To: "0x2112"},
+		},
+	}
+	s.processBlock(b)
+
+	subscribedTxs := s.GetTransactions("0x1111")
+	assert.Equal(t, 2, len(subscribedTxs))
+	otherTxs := s.GetTransactions("0x2111")
+	assert.Equal(t, 0, len(otherTxs))
 }

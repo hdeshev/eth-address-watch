@@ -24,6 +24,6 @@ func main() {
 
 	err := ops.Wait()
 	if !errors.Is(err, context.Canceled) {
-		log.Error("server terminated abnormally", "boot_error", err)
+		log.Error("server terminated abnormally", "error", err)
 	}
 }

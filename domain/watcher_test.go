@@ -46,7 +46,7 @@ func Test_Tick_SingleBlock(t *testing.T) {
 	client := stubClient(t, 0x11, []*Block{
 		{
 			Number: "0x11",
-			Transactions: []Transaction{
+			Transactions: []*Transaction{
 				{From: "0x1111", To: "0x1112"},
 			},
 		},
@@ -81,13 +81,13 @@ func Test_Tick_CatchupMultipleBlocks(t *testing.T) {
 	client := stubClient(t, 0x12, []*Block{
 		{
 			Number: "0x11",
-			Transactions: []Transaction{
+			Transactions: []*Transaction{
 				{From: "0x1111", To: "0x1112"},
 			},
 		},
 		{
 			Number: "0x12",
-			Transactions: []Transaction{
+			Transactions: []*Transaction{
 				{From: "0x2111", To: "0x2112"},
 			},
 		},
@@ -130,7 +130,7 @@ func Test_Tick_NoopIfCaughtUp(t *testing.T) {
 	client := stubClient(t, 0x12, []*Block{
 		{
 			Number: "0x12",
-			Transactions: []Transaction{
+			Transactions: []*Transaction{
 				{From: "0x2111", To: "0x2112"},
 			},
 		},

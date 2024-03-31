@@ -41,7 +41,7 @@ func NewWatcher(log *slog.Logger, cfg *config.Config, client ETHClient, blockOut
 }
 
 func (w *Watcher) Start(ctx context.Context) error {
-	w.log.Info("starting watcher")
+	w.log.Info("starting block watcher")
 	blockNumber, err := w.ethClient.GetLatestBlock(ctx)
 	if err != nil {
 		return fmt.Errorf("error getting latest block: %w", err)
@@ -86,13 +86,7 @@ func (w *Watcher) tick() {
 		}
 
 		w.lastBlock = i
-		number := 0
-		_, err = fmt.Sscanf(block.Number, "0x%x", &number)
-		if err != nil {
-			w.log.Error("error parsing block number", "block", i, "raw_value", block.Number, "error", err)
-			return
-		}
-		block.NumberParsed = number
+		block.NumberParsed = i
 		w.blockOutput <- block
 	}
 }

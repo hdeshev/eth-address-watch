@@ -31,7 +31,7 @@ func NewApplication(ctx context.Context, log *slog.Logger) *Application {
 	cfg := config.New()
 	blockC := make(chan *domain.Block, blockBufferSize)
 
-	service := domain.NewService(log, cfg, blockC)
+	service := domain.NewService(log, blockC)
 	server := http.NewServer(log, service)
 	client := eth.NewClient(cfg)
 	watcher := domain.NewWatcher(log, cfg, client, blockC)

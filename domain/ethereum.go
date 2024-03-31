@@ -1,10 +1,10 @@
 package domain
 
 type Block struct {
-	Number       string        `json:"number"`
-	NumberParsed int           `json:"-"`
-	Hash         string        `json:"hash"`
-	Transactions []Transaction `json:"transactions"`
+	Number       string         `json:"number"`
+	NumberParsed int            `json:"-"`
+	Hash         string         `json:"hash"`
+	Transactions []*Transaction `json:"transactions"`
 }
 
 type Transaction struct {

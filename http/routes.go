@@ -10,7 +10,7 @@ import (
 
 type Service interface {
 	GetCurrentBlock() int
-	GetTransactions(address string) []domain.Transaction
+	GetTransactions(address string) []*domain.Transaction
 	Subscribe(address string) bool
 }
 

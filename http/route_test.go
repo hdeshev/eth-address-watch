@@ -26,9 +26,9 @@ func (m *MockService) GetCurrentBlock() int {
 	return args.Int(0)
 }
 
-func (m *MockService) GetTransactions(address string) []domain.Transaction {
+func (m *MockService) GetTransactions(address string) []*domain.Transaction {
 	args := m.Called()
-	return args.Get(0).([]domain.Transaction)
+	return args.Get(0).([]*domain.Transaction)
 }
 
 func (m *MockService) Subscribe(address string) bool {
@@ -58,8 +58,8 @@ func Test_GetBlock(t *testing.T) {
 func Test_GeTransactions(t *testing.T) {
 	log := slog.Default()
 
-	mockService := new(MockService)
-	mockService.On("GetTransactions").Return([]domain.Transaction{
+	mockService := &MockService{}
+	mockService.On("GetTransactions").Return([]*domain.Transaction{
 		{
 			From:     "address1",
 			To:       "address2",
@@ -167,7 +167,7 @@ func Test_Subscribe(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			log := slog.Default()
 
-			mockService := new(MockService)
+			mockService := &MockService{}
 			mockService.On("Subscribe").Return(tt.wantResult)
 
 			router := NewRouter(log, mockService)
