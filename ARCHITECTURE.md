@@ -39,6 +39,8 @@ The service is exposed to the outside world via an HTTP API that is implemented 
 
 The service can be deployed to any container runtime. We have a working Docker image builder that can be extended with a Helm chart.
 
+Configuration is done via environment variables, [12-factor style](https://12factor.net/config). See `config/config.go` for the full list. Those have been kept to the bare minimum like the ETH node endpoint.
+
 ## Scalability
 
 The service uses only in-memory data to store transactions and subscriptions. To make it real, we need some real persistence:
@@ -59,6 +61,6 @@ The service uses only in-memory data to store transactions and subscriptions. To
 
 ## Monitoring and Logging
 
-- Logging is implemented using the relatively new `log/slog` package. Any structured logging package can be used.
+- Logging is implemented using the relatively new `log/slog` Go stdlib package. The root logger is created in `main.go` and propagated to downstream services, so we can easily change log configuration and say easily switch to JSON-based log lines.
 - No tracing and monitoring has been implemented. I would hook that with HTTP middleware both for the HTTP API service and the ETH JSON-RPC client. I can see some opportunities for tracking additional metrics like the number of subscriptions, the number of blocks and transactions that we parse, etc.
 - Speaking of tracking parsed blocks and transactions, once we have those metrics in place, we could add alerts for cases when they drop to zero. We can also alert on the usual metrics like increased error rates, increased latencies, etc.

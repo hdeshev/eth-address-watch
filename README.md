@@ -10,13 +10,15 @@ Architecture description in [ARCHITECTURE](ARCHITECTURE.md)
 1. Install `golangci-lint`
 2. Install `pre-commit`
 
-Nix/NixOS users can use the provided `flake.nix` and enter a dev shell with all dependencies in place by running:
+[Nix](https://nixos.org/) users can use the provided `flake.nix` and enter a dev shell with all dependencies in place by running:
 
 ```sh
 nix develop
 ```
 
-Tested on Linux, but the above Nix setup should work on macOS too.
+Editors with [Direnv](https://direnv.net/) support/plugins (VS Code, Emacs, NeoVim) can pick up the dev shell environment and use the tools in a reproducible manner.
+
+Tested on Linux, but the Nix setup should work on macOS too.
 
 ### Installing dependencies
 
@@ -61,6 +63,8 @@ make test
 
 ### Running the service
 
+The service entrypoint is `main.go`, which you can build and run directly, but we offer several helpers.
+
 Local developer run, assuming you have all the dependencies and the Go toolchain
 
 ```sh
@@ -100,7 +104,7 @@ curl 'http://localhost:9000/transactions?address=0xdac17f958d2ee523a220620699459
     | jq '.data'
 ```
 
-Note the use of `jq` above to pretty-print the output. Since the USDT smart contract address has a lot of transactions, you could use a `jq` trick to get just the total number of transactions (by fetching the length of the `data` response attribute).
+Note the use of [jq](https://github.com/jqlang/jq) above to pretty-print the output. Since the USDT smart contract address has a lot of transactions, you could use a `jq` trick to get just the total number of transactions (by fetching the length of the `data` response attribute).
 
 ```sh
 curl -s 'http://localhost:9000/transactions?address=0xdac17f958d2ee523a2206206994597c13d831ec7' \
